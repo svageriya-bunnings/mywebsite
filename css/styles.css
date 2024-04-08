@@ -1,11 +1,21 @@
 /* css/styles.css */
 
+:root {
+    --sk-body-background-color: #fff;
+    --sk-body-text-color: #1d1d1f;
+}
+
 body {
-    font-family: Arial, sans-serif;
+    background-color: var(--sk-body-background-color);
+    color: var(--sk-body-text-color);
+    font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: -0.022em;
+    line-height: 1.47059;
     margin: 0;
     padding: 0;
-    background-color: #000;
-    color: #fff;
 }
 
 .container {
