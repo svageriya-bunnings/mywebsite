@@ -2,50 +2,38 @@
 
 :root {
     --sk-body-background-color: #fff;
-    --sk-body-text-color: #000000;
+    --sk-body-text-color: #000;
+    --sk-container-background-color: #333;
+    --sk-text-color: #fff;
+    --sk-link-hover-color: #ccc;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --sk-body-background-color: #000;
+        --sk-body-text-color: #fff;
+        --sk-container-background-color: #666;
+        --sk-text-color: #fff;
+        --sk-link-hover-color: #999;
+    }
 }
 
 body {
     background-color: var(--sk-body-background-color);
     color: var(--sk-body-text-color);
-    font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 17px;
-    font-style: normal;
-    font-weight: 400;
-    letter-spacing: -0.022em;
-    line-height: 1.47059;
-    margin: 0;
-    padding: 0;
+    /* rest of your styles */
 }
 
 .container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #333;
-    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+    background-color: var(--sk-container-background-color);
+    /* rest of your styles */
 }
 
 h1, h2, p {
-    margin-bottom: 20px;
-    color: #fff;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-}
-
-li {
-    margin-bottom: 10px;
-    color: #ccc;
-}
-
-a {
-    text-decoration: none;
-    color: #fff;
+    color: var(--sk-text-color);
+    /* rest of your styles */
 }
 
 a:hover {
-    color: #ccc;
+    color: var(--sk-link-hover-color);
 }
