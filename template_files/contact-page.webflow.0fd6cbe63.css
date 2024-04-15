@@ -261,6 +261,7 @@ a {
   background-position: 50% 50%;
   background-size: contain;
   background-repeat: no-repeat;
+  margin-top: 50px;
 }
 
 .subpage-container {
