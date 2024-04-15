@@ -580,6 +580,7 @@ a {
 .contact-container {
   position: relative;
   background-color: #fff;
+  margin-top: auto;
 }
 
 .bottom-footer-link {
