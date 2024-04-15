@@ -320,13 +320,13 @@ a {
   background-color: rgba(0, 0, 0, .09);
 }
 
-.contact-block-image-overlay {
+/* .contact-block-image-overlay {
   width: 100%;
   height: 100%;
   padding-top: 68px;
   background-color: rgba(52, 61, 71, .6);
   text-align: center;
-}
+} */
 
 .contact-avatar-block {
   display: block;
