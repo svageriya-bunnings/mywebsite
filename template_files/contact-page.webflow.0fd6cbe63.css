@@ -259,8 +259,7 @@ a {
   background-color: #000;
   background-image: url("home_bg.jpg");
   background-position: 50% 50%;
-  background-size: contain;
-  background-repeat: no-repeat;
+  background-size: 100% 50%;
   margin-top: 50px; 
 }
 
