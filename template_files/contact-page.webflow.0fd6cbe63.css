@@ -367,8 +367,7 @@ a {
 .page-content-overlay {
   display: block;
   height: 100%;
-  padding-top: 65px;
-  padding-bottom: 65px;
+
 }
 
 .contact-info-list {
