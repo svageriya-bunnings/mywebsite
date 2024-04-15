@@ -367,7 +367,7 @@ a {
 .page-content-overlay {
   display: block;
   height: 100%;
-  padding-top: 100%;
+  padding-top: 50%;
   padding-bottom: 0px;
 }
 
