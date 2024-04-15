@@ -698,8 +698,8 @@ html.w-mod-js *[data-ix="hide-contact-form"] {
     padding-left: 35px;
   }
   .contact-avatar-block {
-    width: 100px;
-    height: 100px;
+    width: 100%;
+    height: 100%;
   }
   .page-content-overlay {
     padding: 35px;
@@ -783,8 +783,8 @@ html.w-mod-js *[data-ix="hide-contact-form"] {
     padding-top: 25px;
   }
   .contact-avatar-block {
-    width: 80px;
-    height: 80px;
+    width: 100%;
+    height: 100%;
   }
   .social-links-container {
     margin-top: 5px;
