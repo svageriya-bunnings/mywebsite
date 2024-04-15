@@ -334,7 +334,7 @@ a {
   height: 200px;
   border: 4px solid #fff;
   border-radius: 100%;
-  background-image: url("https://media.licdn.com/dms/image/D5603AQELL-g6eksbVA/profile-displayphoto-shrink_200_200/0/1712414548198?e=2147483647&v=beta&t=3Krfn8BwgfXEZtvvFX02DDyENZ0GwI182JDOXla6cOU");
+  background-image: url("template_files/home_bg.jpg");
   background-position: 50% 50%;
   background-size: cover;
 }
