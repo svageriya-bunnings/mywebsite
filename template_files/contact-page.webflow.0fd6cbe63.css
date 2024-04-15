@@ -257,7 +257,7 @@ a {
   position: relative;
   z-index: 1;
   background-color: #000;
-  background-image: url("template_files/home_bg.jpg");
+  background-image: url("home_bg.jpg");
   background-position: 50% 50%;
   background-size: cover;
 }
@@ -693,7 +693,7 @@ html.w-mod-js *[data-ix="hide-contact-form"] {
     width: 100%;
   }
   .contact-content-block {
-    overflow: hidden;
+    overflow: visible;
     padding-right: 25px;
     padding-left: 35px;
   }
