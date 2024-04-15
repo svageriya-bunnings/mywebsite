@@ -260,6 +260,7 @@ a {
   background-image: url("home_bg.jpg");
   background-position: 50% 50%;
   background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .subpage-container {
@@ -577,6 +578,7 @@ a {
 
 .contact-container {
   position: relative;
+  background-color: #fff;
 }
 
 .bottom-footer-link {
