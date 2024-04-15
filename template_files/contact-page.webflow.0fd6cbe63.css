@@ -330,12 +330,12 @@ a {
 
 .contact-avatar-block {
   display: block;
-  width: 200px;
-  height: 200px;
-  border: 4px solid #fff;
-  border-radius: 100%;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 0;
   background-image: url("template_files/home_bg.jpg");
-  background-position: 50% 50%;
+  background-position: center center;
   background-size: cover;
 }
 
