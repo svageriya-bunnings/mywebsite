@@ -1,0 +1,101 @@
+/ personal-website/personal-website/assets/css/responsive.css
+/* Responsive Design Styles */
+
+@media (max-width: 1200px) {
+    .container {
+        padding: 15px;
+    }
+
+    .header-wrapper {
+        margin-bottom: 20px;
+    }
+
+    .profile-photo {
+        width: 140px;
+        height: 140px;
+    }
+
+    .gradient-text {
+        font-size: 2rem;
+    }
+
+    .title-badge {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .download-btn, .contact-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-photo {
+        width: 120px;
+        height: 120px;
+    }
+
+    .gradient-text {
+        font-size: 1.8rem;
+    }
+
+    .section-card {
+        padding: 16px;
+    }
+
+    .card-header h2 {
+        font-size: 1.3rem;
+    }
+
+    .social-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+
+    .like-btn {
+        font-size: 0.9rem;
+    }
+
+    .footer-section {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .visitor-counter {
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .gradient-text {
+        font-size: 1.5rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .download-btn, .contact-btn {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    .modal-content {
+        padding: 20px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 10px;
+    }
+
+    .cancel-btn {
+        padding: 10px;
+    }
+}
