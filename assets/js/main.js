@@ -39,12 +39,13 @@ document.addEventListener('DOMContentLoaded', function() {
   const ctx = canvas.getContext('2d');
   const w = canvas.width, h = canvas.height;
   let player = { x: 40, y: h-40, w: 32, h: 32, vy: 0, jumping: false };
-  let ground = h-8;
-  let gravity = 0.7;
+  const ground = h-8;
+  const gravity = 0.7;
   let clouds = [];
   let frame = 0;
   let score = 0;
   let gameOver = false;
+  let missedClouds = 0;
 
   function drawPlayer() {
     ctx.save();
@@ -85,6 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
     frame = 0;
     score = 0;
     gameOver = false;
+    missedClouds = 0;
   }
 
   function jump() {
@@ -109,27 +111,32 @@ document.addEventListener('DOMContentLoaded', function() {
     // Clouds
     if (frame % 70 === 0) {
       let r = 16 + Math.random()*12;
-      clouds.push({ x: w, y: ground-30-Math.random()*40, r: r });
+      clouds.push({ x: w, y: ground-30-Math.random()*40, r: r, caught: false });
     }
     for (let i=0; i<clouds.length; i++) {
       clouds[i].x -= 5;
     }
-    // Remove off-screen
-    clouds = clouds.filter(c => c.x + c.r > 0);
+    // Remove off-screen and count missed clouds
+    for (let i=0; i<clouds.length; i++) {
+      if (clouds[i].x + clouds[i].r < 0 && !clouds[i].caught) {
+        missedClouds++;
+        clouds.splice(i,1);
+        i--;
+      }
+    }
     // Collision (catch cloud)
     for (let i=0; i<clouds.length; i++) {
       let c = clouds[i];
-      if (player.x < c.x + c.r && player.x + player.w > c.x - c.r && player.y < c.y + c.r*0.6 && player.y + player.h > c.y - c.r*0.6) {
+      if (!c.caught && player.x < c.x + c.r && player.x + player.w > c.x - c.r && player.y < c.y + c.r*0.6 && player.y + player.h > c.y - c.r*0.6) {
         score += 100;
+        c.caught = true;
         clouds.splice(i,1);
         i--;
       }
     }
     if (!gameOver) score++;
-    // Game over if missed 3 clouds (let's say)
-    if (score > 0 && frame % 350 === 0) {
-      if (clouds.length > 3) gameOver = true;
-    }
+    // Game over if missed 3 clouds
+    if (missedClouds >= 3) gameOver = true;
   }
 
   function draw() {
@@ -140,10 +147,11 @@ document.addEventListener('DOMContentLoaded', function() {
     ctx.fillStyle = '#b0b8c1';
     ctx.font = 'bold 18px Segoe UI, Arial';
     ctx.fillText('Score: ' + Math.floor(score/5), 10, 24);
+    ctx.fillText('Missed: ' + missedClouds + '/3', 320, 24);
     if (gameOver) {
       ctx.fillStyle = '#ff3cac';
       ctx.font = 'bold 22px Segoe UI, Arial';
-      ctx.fillText('Game Over! Tap/Space to restart', 50, h/2);
+      ctx.fillText('Game Over! Tap/Space to restart', 30, h/2);
     }
   }
 
