@@ -32,140 +32,141 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Catch the Cloud Game Script
+// Classic Snake Game Script
 (function() {
   const canvas = document.getElementById('cloudGame');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const w = canvas.width, h = canvas.height;
-  let player = { x: 40, y: h-40, w: 32, h: 32, vy: 0, jumping: false };
-  const ground = h-8;
-  const gravity = 0.7;
-  let clouds = [];
-  let frame = 0;
+  const grid = 20;
+  let snake = [{x: grid*5, y: grid*3}];
+  let direction = {x: 1, y: 0};
+  let nextDir = {x: 1, y: 0};
+  let food = {x: grid*8, y: grid*5};
   let score = 0;
   let gameOver = false;
-  let missedClouds = 0;
-
-  function drawPlayer() {
-    ctx.save();
-    ctx.fillStyle = '#00eaff';
-    ctx.shadowColor = '#00eaff';
-    ctx.shadowBlur = 8;
-    ctx.fillRect(player.x, player.y, player.w, player.h);
-    ctx.restore();
-    // Smile
-    ctx.beginPath();
-    ctx.arc(player.x+16, player.y+22, 8, 0, Math.PI, false);
-    ctx.strokeStyle = '#232946';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  }
-
-  function drawCloud(cloud) {
-    ctx.save();
-    ctx.fillStyle = '#fff';
-    ctx.globalAlpha = 0.85;
-    ctx.beginPath();
-    ctx.ellipse(cloud.x, cloud.y, cloud.r, cloud.r*0.6, 0, 0, 2*Math.PI);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-    ctx.restore();
-  }
-
-  function drawGround() {
-    ctx.fillStyle = '#39ff14';
-    ctx.fillRect(0, ground, w, 8);
-  }
+  let moveInterval = 90;
+  let lastMove = 0;
 
   function resetGame() {
-    player.y = h-40;
-    player.vy = 0;
-    player.jumping = false;
-    clouds = [];
-    frame = 0;
+    snake = [{x: grid*5, y: grid*3}];
+    direction = {x: 1, y: 0};
+    nextDir = {x: 1, y: 0};
+    food = {x: grid*(2+Math.floor(Math.random()*16)), y: grid*(2+Math.floor(Math.random()*4+2))};
     score = 0;
     gameOver = false;
-    missedClouds = 0;
-  }
-
-  function jump() {
-    if (!player.jumping && !gameOver) {
-      player.vy = -11;
-      player.jumping = true;
-    }
-    if (gameOver) resetGame();
-  }
-
-  function update() {
-    if (gameOver) return;
-    frame++;
-    // Player physics
-    player.y += player.vy;
-    player.vy += gravity;
-    if (player.y >= h-40) {
-      player.y = h-40;
-      player.vy = 0;
-      player.jumping = false;
-    }
-    // Clouds
-    if (frame % 70 === 0) {
-      let r = 16 + Math.random()*12;
-      clouds.push({ x: w, y: ground-30-Math.random()*40, r: r, caught: false });
-    }
-    for (let i=0; i<clouds.length; i++) {
-      clouds[i].x -= 5;
-    }
-    // Remove off-screen and count missed clouds
-    for (let i=0; i<clouds.length; i++) {
-      if (clouds[i].x + clouds[i].r < 0 && !clouds[i].caught) {
-        missedClouds++;
-        clouds.splice(i,1);
-        i--;
-      }
-    }
-    // Collision (catch cloud)
-    for (let i=0; i<clouds.length; i++) {
-      let c = clouds[i];
-      if (!c.caught && player.x < c.x + c.r && player.x + player.w > c.x - c.r && player.y < c.y + c.r*0.6 && player.y + player.h > c.y - c.r*0.6) {
-        score += 100;
-        c.caught = true;
-        clouds.splice(i,1);
-        i--;
-      }
-    }
-    if (!gameOver) score++;
-    // Game over if missed 3 clouds
-    if (missedClouds >= 3) gameOver = true;
+    lastMove = 0;
   }
 
   function draw() {
     ctx.clearRect(0,0,w,h);
-    drawGround();
-    drawPlayer();
-    for (let c of clouds) drawCloud(c);
+    // Draw food
+    ctx.save();
+    ctx.fillStyle = '#ff3cac';
+    ctx.shadowColor = '#ff3cac';
+    ctx.shadowBlur = 8;
+    ctx.fillRect(food.x, food.y, grid, grid);
+    ctx.restore();
+    // Draw snake
+    for (let i=0; i<snake.length; i++) {
+      ctx.save();
+      ctx.fillStyle = i === 0 ? '#00eaff' : '#39ff14';
+      ctx.shadowColor = i === 0 ? '#00eaff' : '#39ff14';
+      ctx.shadowBlur = i === 0 ? 8 : 0;
+      ctx.fillRect(snake[i].x, snake[i].y, grid, grid);
+      ctx.restore();
+    }
+    // Score
     ctx.fillStyle = '#b0b8c1';
     ctx.font = 'bold 18px Segoe UI, Arial';
-    ctx.fillText('Score: ' + Math.floor(score/5), 10, 24);
-    ctx.fillText('Missed: ' + missedClouds + '/3', 320, 24);
+    ctx.fillText('Score: ' + score, 10, 24);
     if (gameOver) {
       ctx.fillStyle = '#ff3cac';
       ctx.font = 'bold 22px Segoe UI, Arial';
-      ctx.fillText('Game Over! Tap/Space to restart', 30, h/2);
+      ctx.fillText('Game Over! Tap/Arrow/Space to restart', 20, h/2);
     }
   }
 
-  function loop() {
-    update();
+  function moveSnake() {
+    if (gameOver) return;
+    direction = {...nextDir};
+    let head = {x: snake[0].x + direction.x*grid, y: snake[0].y + direction.y*grid};
+    // Wall wrap
+    if (head.x < 0) head.x = w-grid;
+    if (head.x >= w) head.x = 0;
+    if (head.y < 0) head.y = h-grid;
+    if (head.y >= h) head.y = 0;
+    // Self collision
+    for (let i=0; i<snake.length; i++) {
+      if (head.x === snake[i].x && head.y === snake[i].y) {
+        gameOver = true;
+        return;
+      }
+    }
+    snake.unshift(head);
+    // Eat food
+    if (head.x === food.x && head.y === food.y) {
+      score++;
+      let valid = false;
+      while (!valid) {
+        food.x = grid * Math.floor(Math.random() * (w/grid));
+        food.y = grid * Math.floor(Math.random() * (h/grid));
+        valid = !snake.some(s => s.x === food.x && s.y === food.y);
+      }
+    } else {
+      snake.pop();
+    }
+  }
+
+  function loop(ts) {
+    if (!lastMove) lastMove = ts;
+    if (!gameOver && ts - lastMove > moveInterval) {
+      moveSnake();
+      lastMove = ts;
+    }
     draw();
     requestAnimationFrame(loop);
   }
 
+  function setDir(x, y) {
+    // Prevent reverse
+    if (gameOver) { resetGame(); return; }
+    if (x === -direction.x && y === -direction.y) return;
+    nextDir = {x, y};
+  }
+
   document.addEventListener('keydown', function(e) {
-    if (e.code === 'Space') jump();
+    if (e.code === 'ArrowUp') setDir(0,-1);
+    else if (e.code === 'ArrowDown') setDir(0,1);
+    else if (e.code === 'ArrowLeft') setDir(-1,0);
+    else if (e.code === 'ArrowRight') setDir(1,0);
+    else if (e.code === 'Space') { if (gameOver) resetGame(); }
   });
-  canvas.addEventListener('pointerdown', jump);
+  canvas.addEventListener('pointerdown', function() { if (gameOver) resetGame(); });
+  canvas.addEventListener('touchstart', function(e) {
+    if (gameOver) { resetGame(); return; }
+    // Simple swipe for mobile
+    let startX = null, startY = null;
+    function move(ev) {
+      if (!startX) {
+        startX = ev.touches[0].clientX;
+        startY = ev.touches[0].clientY;
+        return;
+      }
+      let dx = ev.touches[0].clientX - startX;
+      let dy = ev.touches[0].clientY - startY;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        if (dx > 10) setDir(1,0);
+        else if (dx < -10) setDir(-1,0);
+      } else {
+        if (dy > 10) setDir(0,1);
+        else if (dy < -10) setDir(0,-1);
+      }
+      canvas.removeEventListener('touchmove', move);
+    }
+    canvas.addEventListener('touchmove', move);
+  });
 
   resetGame();
-  loop();
+  requestAnimationFrame(loop);
 })();
