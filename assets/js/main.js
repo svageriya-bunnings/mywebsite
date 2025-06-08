@@ -91,11 +91,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (gameOver) return;
     direction = {...nextDir};
     let head = {x: snake[0].x + direction.x*grid, y: snake[0].y + direction.y*grid};
-    // Wall wrap
-    if (head.x < 0) head.x = w-grid;
-    if (head.x >= w) head.x = 0;
-    if (head.y < 0) head.y = h-grid;
-    if (head.y >= h) head.y = 0;
+    // Wall collision (game over)
+    if (head.x < 0 || head.x >= w || head.y < 0 || head.y >= h) {
+      gameOver = true;
+      return;
+    }
     // Self collision
     for (let i=0; i<snake.length; i++) {
       if (head.x === snake[i].x && head.y === snake[i].y) {
