@@ -48,6 +48,8 @@ document.addEventListener('DOMContentLoaded', function() {
   let moveInterval = 90;
   let lastMove = 0;
   let showCoffee = false;
+  let started = false;
+  let highScore = localStorage.getItem('snakeHighScore') ? parseInt(localStorage.getItem('snakeHighScore')) : 0;
 
   // Display score outside canvas
   let scoreDiv = document.getElementById('snake-score');
@@ -60,6 +62,17 @@ document.addEventListener('DOMContentLoaded', function() {
     scoreDiv.style.color = 'var(--neon-blue, #00eaff)';
     scoreDiv.style.margin = '0.5rem 0 0.2rem 0';
     canvas.parentNode.insertBefore(scoreDiv, canvas);
+  }
+  let highScoreDiv = document.getElementById('snake-highscore');
+  if (!highScoreDiv) {
+    highScoreDiv = document.createElement('div');
+    highScoreDiv.id = 'snake-highscore';
+    highScoreDiv.style.textAlign = 'center';
+    highScoreDiv.style.fontWeight = 'bold';
+    highScoreDiv.style.fontSize = '1.05rem';
+    highScoreDiv.style.color = '#f5a623';
+    highScoreDiv.style.margin = '0.1rem 0 0.2rem 0';
+    scoreDiv.parentNode.insertBefore(highScoreDiv, scoreDiv.nextSibling);
   }
   let coffeeDiv = document.getElementById('coffee-message');
   if (!coffeeDiv) {
@@ -82,26 +95,29 @@ document.addEventListener('DOMContentLoaded', function() {
     gameOver = false;
     lastMove = 0;
     showCoffee = false;
+    started = false;
     coffeeDiv.textContent = '';
   }
 
   function draw() {
     ctx.clearRect(0,0,w,h);
     // Draw food
-    ctx.save();
-    ctx.fillStyle = '#ff3cac';
-    ctx.shadowColor = '#ff3cac';
-    ctx.shadowBlur = 8;
-    ctx.fillRect(food.x, food.y, grid, grid);
-    ctx.restore();
-    // Draw snake
-    for (let i=0; i<snake.length; i++) {
+    if (started) {
       ctx.save();
-      ctx.fillStyle = i === 0 ? '#00eaff' : '#39ff14';
-      ctx.shadowColor = i === 0 ? '#00eaff' : '#39ff14';
-      ctx.shadowBlur = i === 0 ? 8 : 0;
-      ctx.fillRect(snake[i].x, snake[i].y, grid, grid);
+      ctx.fillStyle = '#ff3cac';
+      ctx.shadowColor = '#ff3cac';
+      ctx.shadowBlur = 8;
+      ctx.fillRect(food.x, food.y, grid, grid);
       ctx.restore();
+      // Draw snake
+      for (let i=0; i<snake.length; i++) {
+        ctx.save();
+        ctx.fillStyle = i === 0 ? '#00eaff' : '#39ff14';
+        ctx.shadowColor = i === 0 ? '#00eaff' : '#39ff14';
+        ctx.shadowBlur = i === 0 ? 8 : 0;
+        ctx.fillRect(snake[i].x, snake[i].y, grid, grid);
+        ctx.restore();
+      }
     }
     // Game Over message
     if (gameOver) {
@@ -113,10 +129,17 @@ document.addEventListener('DOMContentLoaded', function() {
       ctx.fillText('Tap/Arrow/Space to restart', w/2, h/2+10);
       ctx.textAlign = 'start';
     }
+    if (!started && !gameOver) {
+      ctx.fillStyle = '#00eaff';
+      ctx.font = 'bold 15px Segoe UI, Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Tap or Press Any Arrow Key to Start', w/2, h/2);
+      ctx.textAlign = 'start';
+    }
   }
 
   function moveSnake() {
-    if (gameOver) return;
+    if (gameOver || !started) return;
     direction = {...nextDir};
     let head = {x: snake[0].x + direction.x*grid, y: snake[0].y + direction.y*grid};
     // Wall collision (game over)
@@ -135,6 +158,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Eat food
     if (head.x === food.x && head.y === food.y) {
       score++;
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('snakeHighScore', highScore);
+      }
       let valid = false;
       while (!valid) {
         food.x = grid * Math.floor(Math.random() * (w/grid));
@@ -149,13 +176,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function loop(ts) {
     if (!lastMove) lastMove = ts;
-    if (!gameOver && ts - lastMove > moveInterval) {
+    if (!gameOver && started && ts - lastMove > moveInterval) {
       moveSnake();
       lastMove = ts;
     }
     draw();
     // Score outside canvas
     scoreDiv.textContent = 'Score: ' + score;
+    highScoreDiv.textContent = 'High Score: ' + highScore;
     // Coffee message
     if (score >= 10 && !showCoffee) {
       coffeeDiv.textContent = 'You get a Free Coffee.';
@@ -168,6 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function setDir(x, y) {
+    if (!started && !gameOver) started = true;
     // Prevent reverse
     if (gameOver) { resetGame(); return; }
     if (x === -direction.x && y === -direction.y) return;
@@ -175,15 +204,20 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   document.addEventListener('keydown', function(e) {
+    if (!started && !gameOver && (e.code.startsWith('Arrow'))) started = true;
     if (e.code === 'ArrowUp') setDir(0,-1);
     else if (e.code === 'ArrowDown') setDir(0,1);
     else if (e.code === 'ArrowLeft') setDir(-1,0);
     else if (e.code === 'ArrowRight') setDir(1,0);
     else if (e.code === 'Space') { if (gameOver) resetGame(); }
   });
-  canvas.addEventListener('pointerdown', function() { if (gameOver) resetGame(); });
+  canvas.addEventListener('pointerdown', function() {
+    if (gameOver) resetGame();
+    else if (!started) started = true;
+  });
   canvas.addEventListener('touchstart', function(e) {
     if (gameOver) { resetGame(); return; }
+    else if (!started) { started = true; return; }
     // Simple swipe for mobile
     let startX = null, startY = null;
     function move(ev) {
