@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ctx.fillText('Score: ' + score, 10, 24);
     if (gameOver) {
       ctx.fillStyle = '#ff3cac';
-      ctx.font = 'bold 22px Segoe UI, Arial';
+      ctx.font = 'bold 15px Segoe UI, Arial';
       ctx.fillText('Game Over! Tap/Arrow/Space to restart', 20, h/2);
     }
   }
