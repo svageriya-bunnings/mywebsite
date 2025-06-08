@@ -47,6 +47,31 @@ document.addEventListener('DOMContentLoaded', function() {
   let gameOver = false;
   let moveInterval = 90;
   let lastMove = 0;
+  let showCoffee = false;
+
+  // Display score outside canvas
+  let scoreDiv = document.getElementById('snake-score');
+  if (!scoreDiv) {
+    scoreDiv = document.createElement('div');
+    scoreDiv.id = 'snake-score';
+    scoreDiv.style.textAlign = 'center';
+    scoreDiv.style.fontWeight = 'bold';
+    scoreDiv.style.fontSize = '1.1rem';
+    scoreDiv.style.color = 'var(--neon-blue, #00eaff)';
+    scoreDiv.style.margin = '0.5rem 0 0.2rem 0';
+    canvas.parentNode.insertBefore(scoreDiv, canvas);
+  }
+  let coffeeDiv = document.getElementById('coffee-message');
+  if (!coffeeDiv) {
+    coffeeDiv = document.createElement('div');
+    coffeeDiv.id = 'coffee-message';
+    coffeeDiv.style.textAlign = 'center';
+    coffeeDiv.style.fontWeight = 'bold';
+    coffeeDiv.style.fontSize = '1.05rem';
+    coffeeDiv.style.color = '#39ff14';
+    coffeeDiv.style.margin = '0.2rem 0 0.2rem 0';
+    canvas.parentNode.insertBefore(coffeeDiv, canvas.nextSibling);
+  }
 
   function resetGame() {
     snake = [{x: grid*5, y: grid*3}];
@@ -56,6 +81,8 @@ document.addEventListener('DOMContentLoaded', function() {
     score = 0;
     gameOver = false;
     lastMove = 0;
+    showCoffee = false;
+    coffeeDiv.textContent = '';
   }
 
   function draw() {
@@ -76,14 +103,15 @@ document.addEventListener('DOMContentLoaded', function() {
       ctx.fillRect(snake[i].x, snake[i].y, grid, grid);
       ctx.restore();
     }
-    // Score
-    ctx.fillStyle = '#b0b8c1';
-    ctx.font = 'bold 18px Segoe UI, Arial';
-    ctx.fillText('Score: ' + score, 10, 24);
+    // Game Over message
     if (gameOver) {
       ctx.fillStyle = '#ff3cac';
-      ctx.font = 'bold 15px Segoe UI, Arial';
-      ctx.fillText('Game Over! Tap/Arrow/Space to restart', 20, h/2);
+      ctx.font = 'bold 12px Segoe UI, Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Game Over!', w/2, h/2-8);
+      ctx.font = 'bold 10px Segoe UI, Arial';
+      ctx.fillText('Tap/Arrow/Space to restart', w/2, h/2+10);
+      ctx.textAlign = 'start';
     }
   }
 
@@ -125,6 +153,16 @@ document.addEventListener('DOMContentLoaded', function() {
       lastMove = ts;
     }
     draw();
+    // Score outside canvas
+    scoreDiv.textContent = 'Score: ' + score;
+    // Coffee message
+    if (score >= 25 && !showCoffee) {
+      coffeeDiv.textContent = 'You get a Free Coffee.';
+      showCoffee = true;
+    } else if (score < 25) {
+      coffeeDiv.textContent = '';
+      showCoffee = false;
+    }
     requestAnimationFrame(loop);
   }
 
