@@ -139,7 +139,8 @@ document.addEventListener('DOMContentLoaded', function() {
       while (!valid) {
         food.x = grid * Math.floor(Math.random() * (w/grid));
         food.y = grid * Math.floor(Math.random() * (h/grid));
-        valid = !snake.some(s => s.x === food.x && s.y === food.y);
+        // Ensure food is inside canvas and not on snake
+        valid = (food.x >= 0 && food.x <= w-grid && food.y >= 0 && food.y <= h-grid) && !snake.some(s => s.x === food.x && s.y === food.y);
       }
     } else {
       snake.pop();
@@ -156,10 +157,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Score outside canvas
     scoreDiv.textContent = 'Score: ' + score;
     // Coffee message
-    if (score >= 25 && !showCoffee) {
+    if (score >= 10 && !showCoffee) {
       coffeeDiv.textContent = 'You get a Free Coffee.';
       showCoffee = true;
-    } else if (score < 25) {
+    } else if (score < 10) {
       coffeeDiv.textContent = '';
       showCoffee = false;
     }
