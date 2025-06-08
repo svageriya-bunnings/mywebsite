@@ -32,38 +32,43 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Dino Jump Game Script
+// Catch the Cloud Game Script
 (function() {
-  const canvas = document.getElementById('dinoGame');
+  const canvas = document.getElementById('cloudGame');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const w = canvas.width, h = canvas.height;
-  let dino = { x: 40, y: h-40, w: 32, h: 32, vy: 0, jumping: false };
+  let player = { x: 40, y: h-40, w: 32, h: 32, vy: 0, jumping: false };
   let ground = h-8;
   let gravity = 0.7;
-  let obstacles = [];
+  let clouds = [];
   let frame = 0;
   let score = 0;
   let gameOver = false;
 
-  function drawDino() {
+  function drawPlayer() {
     ctx.save();
     ctx.fillStyle = '#00eaff';
     ctx.shadowColor = '#00eaff';
     ctx.shadowBlur = 8;
-    ctx.fillRect(dino.x, dino.y, dino.w, dino.h);
+    ctx.fillRect(player.x, player.y, player.w, player.h);
     ctx.restore();
-    // Eye
-    ctx.fillStyle = '#232946';
-    ctx.fillRect(dino.x + 22, dino.y + 10, 4, 4);
+    // Smile
+    ctx.beginPath();
+    ctx.arc(player.x+16, player.y+22, 8, 0, Math.PI, false);
+    ctx.strokeStyle = '#232946';
+    ctx.lineWidth = 2;
+    ctx.stroke();
   }
 
-  function drawObstacle(obs) {
+  function drawCloud(cloud) {
     ctx.save();
-    ctx.fillStyle = '#ff3cac';
-    ctx.shadowColor = '#ff3cac';
-    ctx.shadowBlur = 6;
-    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+    ctx.fillStyle = '#fff';
+    ctx.globalAlpha = 0.85;
+    ctx.beginPath();
+    ctx.ellipse(cloud.x, cloud.y, cloud.r, cloud.r*0.6, 0, 0, 2*Math.PI);
+    ctx.fill();
+    ctx.globalAlpha = 1;
     ctx.restore();
   }
 
@@ -73,19 +78,19 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function resetGame() {
-    dino.y = h-40;
-    dino.vy = 0;
-    dino.jumping = false;
-    obstacles = [];
+    player.y = h-40;
+    player.vy = 0;
+    player.jumping = false;
+    clouds = [];
     frame = 0;
     score = 0;
     gameOver = false;
   }
 
   function jump() {
-    if (!dino.jumping && !gameOver) {
-      dino.vy = -11;
-      dino.jumping = true;
+    if (!player.jumping && !gameOver) {
+      player.vy = -11;
+      player.jumping = true;
     }
     if (gameOver) resetGame();
   }
@@ -93,38 +98,45 @@ document.addEventListener('DOMContentLoaded', function() {
   function update() {
     if (gameOver) return;
     frame++;
-    // Dino physics
-    dino.y += dino.vy;
-    dino.vy += gravity;
-    if (dino.y >= h-40) {
-      dino.y = h-40;
-      dino.vy = 0;
-      dino.jumping = false;
+    // Player physics
+    player.y += player.vy;
+    player.vy += gravity;
+    if (player.y >= h-40) {
+      player.y = h-40;
+      player.vy = 0;
+      player.jumping = false;
     }
-    // Obstacles
+    // Clouds
     if (frame % 70 === 0) {
-      let obsH = 24 + Math.random()*20;
-      obstacles.push({ x: w, y: ground-obsH, w: 18+Math.random()*10, h: obsH });
+      let r = 16 + Math.random()*12;
+      clouds.push({ x: w, y: ground-30-Math.random()*40, r: r });
     }
-    for (let i=0; i<obstacles.length; i++) {
-      obstacles[i].x -= 5;
+    for (let i=0; i<clouds.length; i++) {
+      clouds[i].x -= 5;
     }
     // Remove off-screen
-    obstacles = obstacles.filter(o => o.x + o.w > 0);
-    // Collision
-    for (let obs of obstacles) {
-      if (dino.x < obs.x + obs.w && dino.x + dino.w > obs.x && dino.y < obs.y + obs.h && dino.y + dino.h > obs.y) {
-        gameOver = true;
+    clouds = clouds.filter(c => c.x + c.r > 0);
+    // Collision (catch cloud)
+    for (let i=0; i<clouds.length; i++) {
+      let c = clouds[i];
+      if (player.x < c.x + c.r && player.x + player.w > c.x - c.r && player.y < c.y + c.r*0.6 && player.y + player.h > c.y - c.r*0.6) {
+        score += 100;
+        clouds.splice(i,1);
+        i--;
       }
     }
     if (!gameOver) score++;
+    // Game over if missed 3 clouds (let's say)
+    if (score > 0 && frame % 350 === 0) {
+      if (clouds.length > 3) gameOver = true;
+    }
   }
 
   function draw() {
     ctx.clearRect(0,0,w,h);
     drawGround();
-    drawDino();
-    for (let obs of obstacles) drawObstacle(obs);
+    drawPlayer();
+    for (let c of clouds) drawCloud(c);
     ctx.fillStyle = '#b0b8c1';
     ctx.font = 'bold 18px Segoe UI, Arial';
     ctx.fillText('Score: ' + Math.floor(score/5), 10, 24);
